@@ -401,6 +401,17 @@ void handle_en(char* format, double val, int scale, char** result, char* c) {
 void handle_decimal(char* format, double val, int scale, char** result, char* c) {
     // Consider an example: write(*, "(es10.2)") 1.123e+10
     // format = "es10.2", val = 11230000128.00, scale = 0, c = "E"
+
+    // Constants for buffer sizes and limits
+    const int MAX_VAL_STR_SIZE = 128;
+    const int MAX_FORMAT_VALUE_SIZE = 64;
+    const int MAX_EXPONENT_SIZE = 12;
+    const int MAX_PRECISION = 60;
+    const int MIN_WIDTH = 14;
+    const int MIN_DECIMAL_DIGITS = 9;
+    const int MIN_DECIMAL_WIDTH = 5;
+    const int MAX_DECIMAL_PRECISION = 15;
+
     int width = 0, decimal_digits = 0;
     int sign_width = (val < 0) ? 1 : 0;
     // sign_width = 0
@@ -414,10 +425,10 @@ void handle_decimal(char* format, double val, int scale, char** result, char* c)
     width = atoi(num_pos);
     // width = 10, decimal_digits = 2
 
-    char val_str[128];
+    char val_str[MAX_VAL_STR_SIZE];
     // TODO: This will work for up to `E65.60` but will fail for:
     // print "(E67.62)", 1.23456789101112e-62_8
-    sprintf(val_str, "%.*lf", (60-integer_length), val);
+    sprintf(val_str, "%.*lf", (MAX_PRECISION-integer_length), val);
     // val_str = "11230000128.00..."
 
     int i = strlen(val_str) - 1;
@@ -462,10 +473,10 @@ void handle_decimal(char* format, double val, int scale, char** result, char* c)
     if (dot_pos != NULL) {
         if (width == 0) {
             if (decimal_digits == 0) {
-                width = 14 + sign_width;
-                decimal_digits = 9;
+                width = MIN_WIDTH + sign_width;
+                decimal_digits = MIN_DECIMAL_DIGITS;
             } else {
-                width = decimal_digits + 5 + sign_width;
+                width = decimal_digits + MIN_DECIMAL_WIDTH + sign_width;
             }
         }
         if (decimal_digits > width - 3) {
@@ -481,7 +492,7 @@ void handle_decimal(char* format, double val, int scale, char** result, char* c)
         }
     }
 
-    char formatted_value[64] = "";
+    char formatted_value[MAX_FORMAT_VALUE_SIZE] = "";
     int spaces = width - sign_width - decimal_digits - 6;
     // spaces = 2
     if (scale > 1) {
@@ -503,8 +514,8 @@ void handle_decimal(char* format, double val, int scale, char** result, char* c)
         int zeros = 0;
         while(val_str[zeros] == '0') zeros++;
         // TODO: figure out a way to round decimals with value < 1e-15
-        if (decimal_digits + scale < strlen(val_str) && val != 0 && decimal_digits + scale - zeros<= 15) {
-            val_str[15] = '\0';
+        if (decimal_digits + scale < strlen(val_str) && val != 0 && decimal_digits + scale - zeros <= MAX_DECIMAL_PRECISION) {
+            val_str[MAX_DECIMAL_PRECISION] = '\0';
             long long t = (long long)round((long double)atoll(val_str) / (long long)pow(10, (strlen(val_str) - decimal_digits - scale)));
             sprintf(val_str, "%lld", t);
             int index = zeros;
@@ -519,8 +530,8 @@ void handle_decimal(char* format, double val, int scale, char** result, char* c)
         char* new_str = substring(val_str, scale, strlen(val_str));
         // new_str = "1230000128" case:  1.123e+10
         int zeros = 0;
-        if (decimal_digits < strlen(new_str) && decimal_digits + scale <= 15) {
-            new_str[15] = '\0';
+        if (decimal_digits < strlen(new_str) && decimal_digits + scale <= MAX_DECIMAL_PRECISION) {
+            new_str[MAX_DECIMAL_PRECISION] = '\0';
             zeros = strspn(new_str, "0");
             long long t = (long long)round((long double)atoll(new_str) / (long long) pow(10, (strlen(new_str) - decimal_digits)));
             sprintf(new_str, "%lld", t);
@@ -541,7 +552,7 @@ void handle_decimal(char* format, double val, int scale, char** result, char* c)
     strcat(formatted_value, c);
     // formatted_value = "  1.12E"
 
-    char exponent[12];
+    char exponent[MAX_EXPONENT_SIZE];
     if (atoi(num_pos) == 0) {
         sprintf(exponent, "%+02d", (integer_length > 0 && integer_part != 0 ? integer_length - scale : decimal));
     } else {
