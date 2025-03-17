@@ -398,12 +398,7 @@
 *     .. Common blocks ..
       COMMON            /COMBLA/ICASE, N, INCX, INCY, PASS
 *     .. Data statements ..
-      EQUIVALENCE (DT19X(1,1,1),DT19XA(1,1,1)),(DT19X(1,1,5),
-     A   DT19XB(1,1,1)),(DT19X(1,1,9),DT19XC(1,1,1)),
-     B   (DT19X(1,1,13),DT19XD(1,1,1))
-      EQUIVALENCE (DT19Y(1,1,1),DT19YA(1,1,1)),(DT19Y(1,1,5),
-     A   DT19YB(1,1,1)),(DT19Y(1,1,9),DT19YC(1,1,1)),
-     B   (DT19Y(1,1,13),DT19YD(1,1,1))
+
 
       DATA              SA/0.3E0/
       DATA              INCXS/1, 2, -2, -1/

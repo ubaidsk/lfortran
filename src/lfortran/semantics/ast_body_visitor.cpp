@@ -3034,10 +3034,10 @@ public:
                         array_t->m_type = ASRUtils::expr_type(ASRUtils::fetch_ArrayConstant_value(al, ac, 0));
                     }
                 } else {
-                    if (ASR::is_a<ASR::IntrinsicElementalFunction_t>(*value) && 
+                    if (ASR::is_a<ASR::IntrinsicElementalFunction_t>(*value) &&
                           ASR::down_cast<ASR::IntrinsicElementalFunction_t>(value)->m_intrinsic_id == static_cast<int64_t>(ASRUtils::IntrinsicElementalFunctions::Maskl) &&
                             ASRUtils::extract_kind_from_ttype_t(target_type) == 8) {
-                        // Do return_type = kind(8) 
+                        // Do return_type = kind(8)
                         ASR::ttype_t* int_64 = ASRUtils::TYPE(ASR::make_Integer_t(al, value->base.loc, 8));
                         ASR::IntrinsicElementalFunction_t* int_func = ASR::down_cast<ASR::IntrinsicElementalFunction_t>(value);
                         value = ASRUtils::EXPR(ASR::make_IntrinsicElementalFunction_t(al, value->base.loc, int_func->m_intrinsic_id,
@@ -4137,7 +4137,7 @@ public:
             if (ASR::is_a<ASR::Var_t>(*var)) {
                 ASR::Var_t* loop_var = ASR::down_cast<ASR::Var_t>(var);
                 ASR::symbol_t* loop_var_sym = loop_var->m_v;
-                do_loop_variables.push_back(loop_var_sym);
+                // do_loop_variables.push_back(loop_var_sym);
             }
         }
         Vec<ASR::stmt_t*> body;

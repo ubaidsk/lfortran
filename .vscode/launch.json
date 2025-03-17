@@ -18,12 +18,24 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/src/bin/lfortran",
+            "args": ["examples/sblat1.f", "--fixed-form", "--implicit-interface", "--cpp-infer", "--cpp", "-c", "-o", "sblat.o"],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb"
+        },
+        {
+            "name": "GDB examples/expr2.f90",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/src/bin/lfortran",
             "args": ["examples/expr2.f90"],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": false,
-            "MIMode": "lldb"
+            "MIMode": "gdb"
         },
     ]
 }
