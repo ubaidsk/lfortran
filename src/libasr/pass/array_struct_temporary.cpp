@@ -2367,20 +2367,26 @@ class ReplaceModuleVarWithValue:
 
         ASR::Variable_t* y = ASR::down_cast<ASR::Variable_t>(
             ASRUtils::symbol_get_past_external(x->m_v));
-        if( !((check_if_ASR_owner_is_module(y->m_parent_symtab->asr_owner)) &&
-              y->m_storage == ASR::storage_typeType::Parameter) ||
-            y->m_symbolic_value == nullptr ||
-            (y->m_value && ASR::is_a<ASR::StructConstant_t>(*y->m_value))) {
-            return ;
-        }
-
-        ASRUtils::ExprStmtDuplicator expr_duplicator(al);
+        
+        // Get the value to check
         ASR::expr_t* value = nullptr;
         if (y->m_value) {
             value = y->m_value;
         } else {
             value = y->m_symbolic_value;
         }
+        
+        // Check if we should skip replacement
+        if( !((check_if_ASR_owner_is_module(y->m_parent_symtab->asr_owner)) &&
+              y->m_storage == ASR::storage_typeType::Parameter) ||
+            value == nullptr ||
+            (value && ASR::is_a<ASR::StructConstant_t>(*value)) ||
+            (value && ASR::is_a<ASR::ArrayConstructor_t>(*value) &&
+             ASR::is_a<ASR::StructType_t>(*ASRUtils::type_get_past_array(ASRUtils::type_get_past_allocatable(ASRUtils::expr_type(value)))))) {
+            return ;
+        }
+
+        ASRUtils::ExprStmtDuplicator expr_duplicator(al);
 
         // we replace ttype of ArrayConstant value with, it's declared
         // ttype, currently this looks like a special case, and this

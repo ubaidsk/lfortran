@@ -6390,6 +6390,7 @@ inline ASR::asr_t* make_ArrayConstructor_t_util(Allocator &al, const Location &a
                                 ASR::is_a<ASR::ComplexConstant_t>(*a_args[0]) ||
                                 ASR::is_a<ASR::LogicalConstant_t>(*a_args[0]) ||
                                 ASR::is_a<ASR::StringConstant_t>(*a_args[0]) ||
+                                ASR::is_a<ASR::StructConstant_t>(*a_args[0]) ||
                                 ASR::is_a<ASR::IntegerUnaryMinus_t>(*a_args[0]) ||
                                 ASR::is_a<ASR::RealUnaryMinus_t>(*a_args[0]));
     if( n_args > 0 ) {
@@ -6416,18 +6417,21 @@ inline ASR::asr_t* make_ArrayConstructor_t_util(Allocator &al, const Location &a
         dims.push_back(al, dim);
         ASR::ttype_t* new_type = ASRUtils::TYPE(ASR::make_Array_t(al, a_type->base.loc, a_type_->m_type,
             dims.p, dims.n, a_type_->m_physical_type));
-        void *data = set_ArrayConstant_data(a_args_values.p, curr_idx, a_type_->m_type);
-        // data is always allocated to n_data bytes
-        int64_t n_data = curr_idx * extract_kind_from_ttype_t(a_type_->m_type);
-        if (is_character(*a_type_->m_type)) {
-            int len;
-            if(!ASRUtils::extract_value(ASR::down_cast<ASR::String_t>(a_type_->m_type)->m_len, len)){LCOMPILERS_ASSERT(false);}
-            n_data = curr_idx * len;
-        }   
-        value = ASRUtils::EXPR(ASR::make_ArrayConstant_t(al, a_loc, n_data, data, new_type, a_storage_format));
+        // Skip creating ArrayConstant for struct types as they cannot be represented as primitive data
+        if (!ASR::is_a<ASR::StructType_t>(*a_type_->m_type)) {
+            void *data = set_ArrayConstant_data(a_args_values.p, curr_idx, a_type_->m_type);
+            // data is always allocated to n_data bytes
+            int64_t n_data = curr_idx * extract_kind_from_ttype_t(a_type_->m_type);
+            if (is_character(*a_type_->m_type)) {
+                int len;
+                if(!ASRUtils::extract_value(ASR::down_cast<ASR::String_t>(a_type_->m_type)->m_len, len)){LCOMPILERS_ASSERT(false);}
+                n_data = curr_idx * len;
+            }   
+            value = ASRUtils::EXPR(ASR::make_ArrayConstant_t(al, a_loc, n_data, data, new_type, a_storage_format));
+        }
     }
 
-    return is_array_item_constant && all_expr_evaluated ? (ASR::asr_t*) value :
+    return (is_array_item_constant && all_expr_evaluated && value != nullptr) ? (ASR::asr_t*) value :
             ASR::make_ArrayConstructor_t(al, a_loc, a_args, n_args, a_type,
             value, a_storage_format);
 }

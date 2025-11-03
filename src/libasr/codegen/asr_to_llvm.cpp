@@ -9526,11 +9526,21 @@ public:
             } else {
                 LCOMPILERS_ASSERT(false);
             }
+        } else if (ASR::is_a<ASR::StructType_t>(*x_m_type)) {
+            // For struct types, use the first element to get the type
+            ASR::expr_t* first_arg = x.n_args > 0 ? x.m_args[0] : nullptr;
+            el_type = llvm_utils->get_type_from_ttype_t_util(first_arg, x_m_type, module.get());
         } else {
             throw CodeGenError("ConstArray type not supported yet");
         }
-        // Create <n x float> type, where `n` is the length of the `x` constant array
-        llvm::Type* type_fxn = FIXED_VECTOR_TYPE::get(el_type, ASRUtils::get_fixed_size_of_array(x.m_type));
+        // Create <n x float> type (or [n x type] for structs), where `n` is the length of the `x` constant array
+        llvm::Type* type_fxn;
+        if (ASR::is_a<ASR::StructType_t>(*x_m_type)) {
+            // For structs, use array type instead of vector type
+            type_fxn = llvm::ArrayType::get(el_type, ASRUtils::get_fixed_size_of_array(x.m_type));
+        } else {
+            type_fxn = FIXED_VECTOR_TYPE::get(el_type, ASRUtils::get_fixed_size_of_array(x.m_type));
+        }
         // Create a pointer <n x float>* to a stack allocated <n x float>
         llvm::AllocaInst *p_fxn = llvm_utils->CreateAlloca(*builder, type_fxn);
         // Assign the array elements to `p_fxn`.
