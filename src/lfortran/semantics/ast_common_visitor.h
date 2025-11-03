@@ -4288,11 +4288,11 @@ public:
                                         // TODO:: Check if Array Type Matches Do Loop Assignment Type, 
                                         is_correct_type_implieddoloop = true;
                                     }
-                                    } else {
-                                        is_correct_type_implieddoloop = false;
-                                    }
                                 } else {
                                     is_correct_type_implieddoloop = false;
+                                }
+                            } else {
+                                is_correct_type_implieddoloop = false;
                             }
                             if ((!is_correct_type_func && !is_correct_type_implieddoloop) ||
                                 (func_call != nullptr && strcmp(func_call->m_func, sym_type->m_name) != 0)) {
