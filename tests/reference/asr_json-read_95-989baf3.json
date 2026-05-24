@@ -1,0 +1,13 @@
+{
+    "basename": "asr_json-read_95-989baf3",
+    "cmd": "lfortran --show-asr --no-indent --json {infile} -o {outfile}",
+    "infile": "tests/../integration_tests/read_95.f90",
+    "infile_hash": "8c6dc7aa02c0d5c5f82e4487f742ad8d0f3125ce9f02c4460c9bc72b",
+    "outfile": null,
+    "outfile_hash": null,
+    "stdout": "asr_json-read_95-989baf3.stdout",
+    "stdout_hash": "dbc690cd8ac8a1f155db8f056c0fa3b3b21148218ef2316b5d9df044",
+    "stderr": null,
+    "stderr_hash": null,
+    "returncode": 0
+}
